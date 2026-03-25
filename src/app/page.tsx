@@ -1,65 +1,150 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Campaign } from "@/lib/types";
+import { getCampaigns } from "@/lib/storage";
+
+export default function HomePage() {
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setCampaigns(getCampaigns().filter((c) => c.published));
+    setMounted(true);
+  }, []);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="min-h-screen bg-[var(--background)] noise-bg">
+      {/* Header */}
+      <header className="bg-[var(--surface)]/80 backdrop-blur-xl border-b border-[var(--border)] sticky top-0 z-10 animate-slide-down">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            {/* Logo mark */}
+            <div className="relative">
+              <div className="w-11 h-11 bg-[var(--ink)] rounded-xl flex items-center justify-center shadow-lg shadow-black/10">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <path d="M4.98 3.5C4.98 4.88 3.87 6 2.49 6S0 4.88 0 3.5 1.11 1 2.49 1 4.98 2.12 4.98 3.5zM.35 8.35h4.29v13.65H.35V8.35zM8.51 8.35h4.11v1.87h.06c.57-1.08 1.97-2.22 4.06-2.22 4.34 0 5.14 2.86 5.14 6.57v7.56h-4.29v-6.7c0-1.6-.03-3.65-2.22-3.65-2.23 0-2.57 1.74-2.57 3.53v6.82H8.51V8.35z" fill="white"/>
+                </svg>
+              </div>
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[var(--linkedin)] rounded-full border-2 border-[var(--surface)]" />
+            </div>
+            <div>
+              <h1 className="text-lg font-semibold tracking-tight text-[var(--ink)]" style={{ fontFamily: 'var(--font-serif)' }}>
+                Post Amplifier
+              </h1>
+              <p className="text-[11px] font-medium tracking-widest uppercase text-[var(--ink-faint)]">
+                Team Content Hub
+              </p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero section */}
+      <div className={`max-w-6xl mx-auto px-6 pt-16 pb-10 transition-all duration-700 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+        <div className="max-w-2xl">
+          <h2
+            className="text-5xl leading-[1.1] tracking-tight text-[var(--ink)] mb-4"
+            style={{ fontFamily: 'var(--font-serif)' }}
+          >
+            Your team&apos;s<br />
+            <span className="gradient-text">content library</span>
+          </h2>
+          <p className="text-[15px] text-[var(--ink-muted)] leading-relaxed max-w-md">
+            Browse campaigns, pick unique posts and comments, and amplify your company&apos;s presence on LinkedIn.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+      </div>
+
+      <div className="editorial-divider max-w-6xl mx-auto" />
+
+      {/* Content */}
+      <main className="max-w-6xl mx-auto px-6 py-10">
+        {campaigns.length === 0 ? (
+          <div className={`text-center py-24 transition-all duration-500 ${mounted ? 'animate-fade-up' : 'opacity-0'}`}>
+            <div className="w-24 h-24 bg-[var(--surface)] rounded-2xl border border-[var(--border)] flex items-center justify-center mx-auto mb-6 shadow-sm">
+              <svg className="w-10 h-10 text-[var(--ink-faint)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+            </div>
+            <h3
+              className="text-2xl text-[var(--ink)] mb-2"
+              style={{ fontFamily: 'var(--font-serif)' }}
+            >
+              No campaigns yet
+            </h3>
+            <p className="text-sm text-[var(--ink-faint)] max-w-xs mx-auto">
+              Published campaigns will appear here. Ask your admin to create and publish one.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between mb-8">
+              <p className="text-[13px] font-medium tracking-widest uppercase text-[var(--ink-faint)]">
+                {campaigns.length} Active Campaign{campaigns.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {campaigns.map((campaign, i) => (
+                <Link
+                  key={campaign.id}
+                  href={`/campaigns/${campaign.id}`}
+                  className={`group bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-6 card-hover relative overflow-hidden ${mounted ? 'animate-fade-up' : 'opacity-0'}`}
+                  style={{ animationDelay: `${i * 0.06}s` }}
+                >
+                  {/* Decorative corner accent */}
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-[var(--linkedin)]/5 to-transparent rounded-bl-[40px]" />
+
+                  <div className="flex items-start justify-between mb-4 relative">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[var(--linkedin-surface)] text-[var(--linkedin)] text-[11px] font-semibold tracking-wide uppercase rounded-full">
+                      <span className="w-1.5 h-1.5 bg-[var(--linkedin)] rounded-full" />
+                      {campaign.postGoal}
+                    </span>
+                    <span className="text-[11px] text-[var(--ink-faint)] tabular-nums">
+                      {new Date(campaign.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </span>
+                  </div>
+
+                  <p className="text-[14px] text-[var(--ink)] line-clamp-4 mb-5 leading-[1.65]">
+                    {campaign.mainPost}
+                  </p>
+
+                  <div className="flex items-center gap-5 text-[12px] text-[var(--ink-faint)] font-medium">
+                    <span className="flex items-center gap-1.5">
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      {campaign.posts.length} posts
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
+                      {campaign.comments.length} comments
+                    </span>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t border-[var(--border)] flex items-center text-[13px] font-medium text-[var(--linkedin)] opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-[-4px] group-hover:translate-x-0">
+                    Browse content
+                    <svg className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
       </main>
+
+      {/* Footer */}
+      <footer className="max-w-6xl mx-auto px-6 py-8 mt-auto">
+        <div className="editorial-divider mb-6" />
+        <p className="text-[11px] text-[var(--ink-faint)] tracking-wide">
+          LinkedIn Post Amplifier &middot; Internal Tool
+        </p>
+      </footer>
     </div>
   );
 }
