@@ -1,37 +1,5 @@
-import { Campaign } from "./types";
-
-const CAMPAIGNS_KEY = "linkedin_amplifier_campaigns";
 const AUTH_KEY = "linkedin_amplifier_auth";
-
-export function getCampaigns(): Campaign[] {
-  if (typeof window === "undefined") return [];
-  const data = localStorage.getItem(CAMPAIGNS_KEY);
-  return data ? JSON.parse(data) : [];
-}
-
-export function saveCampaign(campaign: Campaign): void {
-  const campaigns = getCampaigns();
-  const index = campaigns.findIndex((c) => c.id === campaign.id);
-  if (index >= 0) {
-    campaigns[index] = campaign;
-  } else {
-    campaigns.unshift(campaign);
-  }
-  localStorage.setItem(CAMPAIGNS_KEY, JSON.stringify(campaigns));
-}
-
-export function getCampaign(id: string): Campaign | null {
-  return getCampaigns().find((c) => c.id === id) || null;
-}
-
-export function getActiveCampaign(): Campaign | null {
-  return getCampaigns().find((c) => c.published) || null;
-}
-
-export function deleteCampaign(id: string): void {
-  const campaigns = getCampaigns().filter((c) => c.id !== id);
-  localStorage.setItem(CAMPAIGNS_KEY, JSON.stringify(campaigns));
-}
+const COPIED_KEY = "linkedin_amplifier_copied";
 
 export function isAuthenticated(): boolean {
   if (typeof window === "undefined") return false;
@@ -45,9 +13,6 @@ export function setAuthenticated(value: boolean): void {
     sessionStorage.removeItem(AUTH_KEY);
   }
 }
-
-// Track copied items per user (per browser)
-const COPIED_KEY = "linkedin_amplifier_copied";
 
 interface CopiedItems {
   [campaignId: string]: {
