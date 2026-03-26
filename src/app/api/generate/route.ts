@@ -70,7 +70,7 @@ const COMMENTS_SCHEMA = {
   },
 };
 
-const POSTS_SYSTEM = `You are a world-class LinkedIn ghostwriter with deep expertise in MARKETING PSYCHOLOGY and CONTENT WRITING.
+const POSTS_SYSTEM = `You are a world-class LinkedIn ghostwriter with deep expertise in MARKETING PSYCHOLOGY and CONTENT WRITING. The current year is 2026 — use current trends, references, and language that feel fresh and relevant to today.
 
 🧠 MARKETING PSYCHOLOGY SKILLS:
 - AIDA framework (Attention → Interest → Desire → Action)
@@ -112,7 +112,7 @@ RULES:
 
 OUTPUT: Return a JSON object with a "posts" array. Each element is one complete post as a string.`;
 
-const COMMENTS_SYSTEM = `You are a LinkedIn engagement strategist with expertise in MARKETING PSYCHOLOGY and COMMUNITY BUILDING.
+const COMMENTS_SYSTEM = `You are a LinkedIn engagement strategist with expertise in MARKETING PSYCHOLOGY and COMMUNITY BUILDING. The current year is 2026 — use current trends and references.
 
 🧠 PSYCHOLOGY OF ENGAGEMENT:
 - Comments that trigger reply chains (ask follow-up questions)
