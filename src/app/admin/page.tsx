@@ -179,7 +179,7 @@ export default function AdminCampaignPage() {
                 style={{ animationDelay: `${i * 60}ms` }}
               >
                 <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `linear-gradient(to right, ${stat.accent}, transparent)` }} />
-                <p className="text-[36px] font-normal text-[var(--ink)] leading-none mb-2 tracking-[-0.03em]" style={{ fontFamily: 'var(--font-serif)' }}>
+                <p className="text-[36px] font-bold text-[var(--ink)] leading-none mb-2 tracking-[-0.03em]">
                   {stat.value}
                 </p>
                 <p className="text-[10px] font-semibold text-[var(--ink-faint)] uppercase tracking-[0.12em]">
@@ -264,7 +264,7 @@ export default function AdminCampaignPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h3 className="text-[20px] text-[var(--ink)] mb-2 tracking-[-0.01em]" style={{ fontFamily: 'var(--font-serif)' }}>
+            <h3 className="text-[20px] text-[var(--ink)] mb-2 tracking-[-0.01em]">
               No active campaign
             </h3>
             <p className="text-[13px] text-[var(--ink-faint)] mb-6 max-w-sm mx-auto">
@@ -322,7 +322,7 @@ export default function AdminCampaignPage() {
       {(showNewForm || (!activeCampaign && draftCampaigns.length === 0)) && (
         <section className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] overflow-hidden">
           <div className="px-6 py-5 border-b border-[var(--border)]/60 flex items-center justify-between">
-            <h2 className="text-[16px] font-semibold text-[var(--ink)] tracking-[-0.01em]" style={{ fontFamily: 'var(--font-serif)' }}>New Campaign</h2>
+            <h2 className="text-[16px] font-semibold text-[var(--ink)] tracking-[-0.01em]">New Campaign</h2>
             {(activeCampaign || draftCampaigns.length > 0) && (
               <button onClick={() => setShowNewForm(false)} className="text-[12px] text-[var(--ink-faint)] hover:text-[var(--ink)] transition-all cursor-pointer">Cancel</button>
             )}

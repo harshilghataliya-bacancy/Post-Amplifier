@@ -89,7 +89,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <path d="M4.98 3.5C4.98 4.88 3.87 6 2.49 6S0 4.88 0 3.5 1.11 1 2.49 1 4.98 2.12 4.98 3.5zM.35 8.35h4.29v13.65H.35V8.35zM8.51 8.35h4.11v1.87h.06c.57-1.08 1.97-2.22 4.06-2.22 4.34 0 5.14 2.86 5.14 6.57v7.56h-4.29v-6.7c0-1.6-.03-3.65-2.22-3.65-2.23 0-2.57 1.74-2.57 3.53v6.82H8.51V8.35z" fill="white"/>
               </svg>
             </div>
-            <h1 className="text-[38px] leading-[1.08] text-white/90 mb-3 tracking-[-0.02em]" style={{ fontFamily: 'var(--font-serif)' }}>
+            <h1 className="text-[38px] leading-[1.08] text-white/90 mb-3 tracking-[-0.02em] font-bold">
               Post<br />Amplifier
             </h1>
             <p className="text-[13px] text-white/30 leading-[1.7] max-w-[260px]">
@@ -107,7 +107,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="w-full max-w-[340px] animate-fade-up">
             <div className="mb-10">
               <p className="text-[10px] font-semibold tracking-[0.25em] uppercase text-[var(--ink-faint)] mb-3">Admin Access</p>
-              <h2 className="text-[28px] text-[var(--ink)] tracking-[-0.02em]" style={{ fontFamily: 'var(--font-serif)' }}>Welcome back</h2>
+              <h2 className="text-[28px] font-bold text-[var(--ink)] tracking-[-0.02em]">Welcome back</h2>
             </div>
             <div className="space-y-5">
               <div>

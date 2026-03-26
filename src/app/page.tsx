@@ -12,6 +12,9 @@ export default function EmployeePage() {
   const [copiedType, setCopiedType] = useState<"post" | "comment" | null>(null);
   const [showFullPost, setShowFullPost] = useState(false);
   const [mounted, setMounted] = useState(false);
+  // Current displayed index (not yet "used" until copy+redirect)
+  const [currentPostIndex, setCurrentPostIndex] = useState<number | null>(null);
+  const [currentCommentIndex, setCurrentCommentIndex] = useState<number | null>(null);
 
   useEffect(() => {
     fetch("/api/campaigns/active")
@@ -20,10 +23,9 @@ export default function EmployeePage() {
         if (data && !data.error) {
           setCampaign(data);
           const allCopied = getCopiedItems();
-          if (allCopied[data.id]) {
-            setCopiedPosts(allCopied[data.id].posts || []);
-            setCopiedComments(allCopied[data.id].comments || []);
-          }
+          const campaignCopied = allCopied[data.id] || { posts: [], comments: [] };
+          setCopiedPosts(campaignCopied.posts || []);
+          setCopiedComments(campaignCopied.comments || []);
         }
       })
       .catch(() => {})
@@ -33,27 +35,46 @@ export default function EmployeePage() {
       });
   }, []);
 
-  const getUnusedPost = useCallback((): { item: string; index: number } | null => {
+  // Pick a random unused post index
+  const pickRandomPost = useCallback((): number | null => {
     if (!campaign) return null;
     const usedSet = new Set(copiedPosts);
-    for (let i = 0; i < campaign.posts.length; i++) {
-      if (!usedSet.has(i)) return { item: campaign.posts[i], index: i };
-    }
-    return null;
+    const available = campaign.posts.map((_, i) => i).filter((i) => !usedSet.has(i));
+    if (available.length === 0) return null;
+    return available[Math.floor(Math.random() * available.length)];
   }, [campaign, copiedPosts]);
 
-  const getUnusedComment = useCallback((): { item: string; index: number } | null => {
+  // Pick a random unused comment index
+  const pickRandomComment = useCallback((): number | null => {
     if (!campaign) return null;
     const usedSet = new Set(copiedComments);
-    for (let i = 0; i < campaign.comments.length; i++) {
-      if (!usedSet.has(i)) return { item: campaign.comments[i], index: i };
-    }
-    return null;
+    const available = campaign.comments.map((_, i) => i).filter((i) => !usedSet.has(i));
+    if (available.length === 0) return null;
+    return available[Math.floor(Math.random() * available.length)];
   }, [campaign, copiedComments]);
 
+  // Initialize current indices once campaign loads
+  useEffect(() => {
+    if (campaign) {
+      if (currentPostIndex === null) setCurrentPostIndex(pickRandomPost());
+      if (currentCommentIndex === null) setCurrentCommentIndex(pickRandomComment());
+    }
+  }, [campaign, currentPostIndex, currentCommentIndex, pickRandomPost, pickRandomComment]);
+
+  // Refresh: pick a new random post/comment (previous one is NOT marked as used)
+  const handleRefreshPost = () => {
+    setCurrentPostIndex(pickRandomPost());
+  };
+
+  const handleRefreshComment = () => {
+    setCurrentCommentIndex(pickRandomComment());
+  };
+
+  // Copy + redirect = marks as used
   const handleCopyPost = async (text: string, index: number) => {
     if (!campaign) return;
     await navigator.clipboard.writeText(text);
+    // Mark as used ONLY now (copy + redirect)
     markCopied(campaign.id, "posts", index);
     setCopiedPosts((prev) => [...new Set([...prev, index])]);
     setCopiedType("post");
@@ -65,6 +86,8 @@ export default function EmployeePage() {
     setTimeout(() => {
       window.open("https://www.linkedin.com/feed/?shareActive=true", "_blank");
       setCopiedType(null);
+      // Auto-load next post after copy
+      setCurrentPostIndex(pickRandomPost());
     }, 800);
   };
 
@@ -83,13 +106,15 @@ export default function EmployeePage() {
       const url = campaign.source_url || "https://www.linkedin.com/feed/";
       window.open(url, "_blank");
       setCopiedType(null);
+      setCurrentCommentIndex(pickRandomComment());
     }, 800);
   };
 
-  const unusedPost = getUnusedPost();
-  const unusedComment = getUnusedComment();
   const hasPosts = campaign ? campaign.campaign_type !== "comments" : false;
   const hasComments = campaign ? campaign.campaign_type !== "posts" : false;
+
+  const currentPost = campaign && currentPostIndex !== null ? campaign.posts[currentPostIndex] : null;
+  const currentComment = campaign && currentCommentIndex !== null ? campaign.comments[currentCommentIndex] : null;
 
   const truncatedPost = campaign
     ? campaign.main_post.split("\n").slice(0, 3).join("\n").substring(0, 200)
@@ -125,7 +150,7 @@ export default function EmployeePage() {
               <path d="M4.98 3.5C4.98 4.88 3.87 6 2.49 6S0 4.88 0 3.5 1.11 1 2.49 1 4.98 2.12 4.98 3.5zM.35 8.35h4.29v13.65H.35V8.35zM8.51 8.35h4.11v1.87h.06c.57-1.08 1.97-2.22 4.06-2.22 4.34 0 5.14 2.86 5.14 6.57v7.56h-4.29v-6.7c0-1.6-.03-3.65-2.22-3.65-2.23 0-2.57 1.74-2.57 3.53v6.82H8.51V8.35z" fill="white"/>
             </svg>
           </div>
-          <h1 className="text-[15px] font-semibold text-[var(--ink)]" style={{ fontFamily: 'var(--font-serif)' }}>Post Amplifier</h1>
+          <h1 className="text-[15px] font-semibold text-[var(--ink)]">Post Amplifier</h1>
         </div>
       </header>
 
@@ -139,7 +164,7 @@ export default function EmployeePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <h3 className="text-[18px] font-semibold text-[var(--ink)] mb-2" style={{ fontFamily: 'var(--font-serif)' }}>
+              <h3 className="text-[18px] font-semibold text-[var(--ink)] mb-2">
                 No active campaign
               </h3>
               <p className="text-[13px] text-[var(--ink-faint)] max-w-xs mx-auto">
@@ -173,17 +198,31 @@ export default function EmployeePage() {
                   <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] relative overflow-hidden shadow-[0_2px_24px_-4px_rgba(12,20,38,0.06)]">
                     <div className="h-[3px] bg-gradient-to-r from-[var(--linkedin)] via-[var(--linkedin)]/50 to-transparent" />
                     <div className="p-6">
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse" />
-                        <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--ink-faint)]">Your unique post</p>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse" />
+                          <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--ink-faint)]">Your unique post</p>
+                        </div>
+                        {currentPost && (
+                          <button
+                            onClick={handleRefreshPost}
+                            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium text-[var(--ink-faint)] hover:text-[var(--linkedin)] hover:bg-[var(--linkedin-surface)] border border-[var(--border)] hover:border-[var(--linkedin)]/20 transition-all cursor-pointer"
+                            title="Get a different post"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Refresh
+                          </button>
+                        )}
                       </div>
-                      {unusedPost ? (
+                      {currentPost ? (
                         <>
                           <div className="relative pl-4 border-l-2 border-[var(--linkedin)]/20 mb-6">
-                            <p className="text-[14px] text-[var(--ink)] whitespace-pre-wrap leading-[1.8]">{unusedPost.item}</p>
+                            <p className="text-[14px] text-[var(--ink)] whitespace-pre-wrap leading-[1.8]">{currentPost}</p>
                           </div>
                           <button
-                            onClick={() => handleCopyPost(unusedPost.item, unusedPost.index)}
+                            onClick={() => handleCopyPost(currentPost, currentPostIndex!)}
                             disabled={copiedType === "post"}
                             className={`w-full py-3.5 rounded-xl text-[13px] font-semibold transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer ${
                               copiedType === "post" ? "bg-[var(--success)] text-white scale-[0.98]" : "bg-[var(--ink)] text-white hover:bg-[var(--linkedin-dark)] active:scale-[0.98]"
@@ -197,7 +236,7 @@ export default function EmployeePage() {
                           </button>
                         </>
                       ) : (
-                        <p className="text-[13px] text-[var(--ink-faint)] text-center py-8">All posts used. Refresh for more.</p>
+                        <p className="text-[13px] text-[var(--ink-faint)] text-center py-8">All posts have been used.</p>
                       )}
                     </div>
                   </div>
@@ -207,15 +246,29 @@ export default function EmployeePage() {
                   <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] relative overflow-hidden shadow-[0_2px_24px_-4px_rgba(12,20,38,0.06)]">
                     <div className="h-[3px] bg-gradient-to-r from-[var(--accent-warm)] via-[var(--accent-warm)]/50 to-transparent" />
                     <div className="p-6">
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse" />
-                        <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--ink-faint)]">Your unique comment</p>
-                      </div>
-                      {unusedComment ? (
-                        <>
-                          <p className="text-[14px] text-[var(--ink)] whitespace-pre-wrap leading-[1.8] mb-6">{unusedComment.item}</p>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse" />
+                          <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--ink-faint)]">Your unique comment</p>
+                        </div>
+                        {currentComment && (
                           <button
-                            onClick={() => handleCopyComment(unusedComment.item, unusedComment.index)}
+                            onClick={handleRefreshComment}
+                            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium text-[var(--ink-faint)] hover:text-[var(--accent-warm)] hover:bg-[var(--accent-warm-surface)] border border-[var(--border)] hover:border-[var(--accent-warm)]/20 transition-all cursor-pointer"
+                            title="Get a different comment"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Refresh
+                          </button>
+                        )}
+                      </div>
+                      {currentComment ? (
+                        <>
+                          <p className="text-[14px] text-[var(--ink)] whitespace-pre-wrap leading-[1.8] mb-6">{currentComment}</p>
+                          <button
+                            onClick={() => handleCopyComment(currentComment, currentCommentIndex!)}
                             disabled={copiedType === "comment"}
                             className={`w-full py-3.5 rounded-xl text-[13px] font-semibold transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer ${
                               copiedType === "comment" ? "bg-[var(--success)] text-white scale-[0.98]" : "bg-[var(--ink)] text-white hover:bg-[var(--linkedin-dark)] active:scale-[0.98]"
@@ -229,7 +282,7 @@ export default function EmployeePage() {
                           </button>
                         </>
                       ) : (
-                        <p className="text-[13px] text-[var(--ink-faint)] text-center py-8">All comments used. Refresh for more.</p>
+                        <p className="text-[13px] text-[var(--ink-faint)] text-center py-8">All comments have been used.</p>
                       )}
                     </div>
                   </div>
@@ -237,7 +290,7 @@ export default function EmployeePage() {
               </div>
 
               <p className="text-center text-[11px] text-[var(--ink-faint)]/60 mt-5">
-                Each employee receives unique content. Refresh after posting to get the next one.
+                Click Refresh to see a different option. Only counted as used after you copy and get redirected to LinkedIn.
               </p>
             </>
           )}

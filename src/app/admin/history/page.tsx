@@ -88,7 +88,7 @@ export default function HistoryPage() {
             className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] px-5 py-4 animate-fade-up"
             style={{ animationDelay: `${i * 60}ms` }}
           >
-            <p className="text-[28px] font-normal text-[var(--ink)] leading-none mb-1 tracking-[-0.03em]" style={{ fontFamily: 'var(--font-serif)' }}>
+            <p className="text-[28px] font-bold text-[var(--ink)] leading-none mb-1 tracking-[-0.03em]">
               {stat.value}
             </p>
             <p className="text-[10px] font-semibold text-[var(--ink-faint)] uppercase tracking-[0.12em]">{stat.label}</p>
@@ -102,7 +102,7 @@ export default function HistoryPage() {
           <svg className="w-8 h-8 text-[var(--ink-faint)]/40 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <p className="text-[14px] text-[var(--ink-muted)]" style={{ fontFamily: 'var(--font-serif)' }}>No campaign history yet</p>
+          <p className="text-[14px] text-[var(--ink-muted)]">No campaign history yet</p>
           <p className="text-[12px] text-[var(--ink-faint)] mt-1">Previous campaigns will appear here after you create and publish new ones.</p>
         </div>
       ) : (
@@ -162,16 +162,16 @@ export default function HistoryPage() {
                       {formatDate(c.created_at)}
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <span className="text-[14px] font-medium text-[var(--ink)]" style={{ fontFamily: 'var(--font-serif)' }}>{c.posts.length}</span>
+                      <span className="text-[14px] font-semibold text-[var(--ink)]">{c.posts.length}</span>
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <span className="text-[14px] font-medium text-[var(--ink)]" style={{ fontFamily: 'var(--font-serif)' }}>{c.comments.length}</span>
+                      <span className="text-[14px] font-semibold text-[var(--ink)]">{c.comments.length}</span>
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <span className="text-[14px] font-medium text-[var(--ink)]" style={{ fontFamily: 'var(--font-serif)' }}>{c.metrics.totalCopies}</span>
+                      <span className="text-[14px] font-semibold text-[var(--ink)]">{c.metrics.totalCopies}</span>
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <span className="text-[14px] font-medium text-[var(--ink)]" style={{ fontFamily: 'var(--font-serif)' }}>{c.metrics.uniqueUsers}</span>
+                      <span className="text-[14px] font-semibold text-[var(--ink)]">{c.metrics.uniqueUsers}</span>
                     </td>
                     <td className="px-5 py-4 text-right">
                       <button
