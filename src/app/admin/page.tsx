@@ -10,7 +10,7 @@ export default function AdminCampaignPage() {
   const [mainPost, setMainPost] = useState("");
   const [postGoal, setPostGoal] = useState("");
   const [sourceUrl, setSourceUrl] = useState("");
-  const [campaignType, setCampaignType] = useState<"posts" | "comments" | "both">("both");
+  const campaignType = "both" as const;
   const [variations, setVariations] = useState(50);
   const [commentCount, setCommentCount] = useState(30);
   const [fetchingUrl, setFetchingUrl] = useState(false);
@@ -68,8 +68,8 @@ export default function AdminCampaignPage() {
         body: JSON.stringify({
           mainPost: mainPost.trim(),
           postGoal: postGoal.trim(),
-          numberOfVariations: campaignType === "comments" ? 0 : variations,
-          numberOfComments: campaignType === "posts" ? 0 : commentCount,
+          numberOfVariations: variations,
+          numberOfComments: commentCount,
         }),
       });
       if (!genRes.ok) throw new Error("Generation failed");
@@ -154,7 +154,6 @@ export default function AdminCampaignPage() {
     setMainPost("");
     setPostGoal("");
     setSourceUrl("");
-    setCampaignType("both");
   };
 
   const { campaigns } = useAdmin();
@@ -199,9 +198,7 @@ export default function AdminCampaignPage() {
                   <span className="text-[10px] font-semibold text-[var(--success)] tracking-[0.05em] uppercase">Live</span>
                 </div>
                 <span className="text-[13px] font-medium text-[var(--ink)]">{activeCampaign.post_goal}</span>
-                <span className="text-[11px] text-[var(--ink-faint)]">
-                  {activeCampaign.campaign_type === "both" ? "Posts & Comments" : activeCampaign.campaign_type === "posts" ? "Posts Only" : "Comments Only"}
-                </span>
+                <span className="text-[11px] text-[var(--ink-faint)]">Posts &amp; Comments</span>
               </div>
               <button
                 onClick={() => { setShowNewForm(true); }}
@@ -221,26 +218,22 @@ export default function AdminCampaignPage() {
 
             {/* Actions */}
             <div className="px-6 py-5 flex flex-wrap gap-3">
-              {(activeCampaign.campaign_type === "posts" || activeCampaign.campaign_type === "both") && (
-                <button
-                  onClick={() => handleGenerateMore("posts")}
-                  disabled={generating}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[12px] font-semibold border border-[var(--border)] text-[var(--ink-muted)] hover:border-[var(--linkedin)] hover:text-[var(--linkedin)] hover:bg-[var(--linkedin-surface)]/50 transition-all disabled:opacity-40 cursor-pointer"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
-                  Generate More Posts
-                </button>
-              )}
-              {(activeCampaign.campaign_type === "comments" || activeCampaign.campaign_type === "both") && (
-                <button
-                  onClick={() => handleGenerateMore("comments")}
-                  disabled={generating}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[12px] font-semibold border border-[var(--border)] text-[var(--ink-muted)] hover:border-[var(--accent-warm)] hover:text-[var(--accent-warm)] hover:bg-[var(--accent-warm-surface)]/50 transition-all disabled:opacity-40 cursor-pointer"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
-                  Generate More Comments
-                </button>
-              )}
+              <button
+                onClick={() => handleGenerateMore("posts")}
+                disabled={generating}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[12px] font-semibold border border-[var(--border)] text-[var(--ink-muted)] hover:border-[var(--linkedin)] hover:text-[var(--linkedin)] hover:bg-[var(--linkedin-surface)]/50 transition-all disabled:opacity-40 cursor-pointer"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+                Generate More Posts
+              </button>
+              <button
+                onClick={() => handleGenerateMore("comments")}
+                disabled={generating}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[12px] font-semibold border border-[var(--border)] text-[var(--ink-muted)] hover:border-[var(--accent-warm)] hover:text-[var(--accent-warm)] hover:bg-[var(--accent-warm-surface)]/50 transition-all disabled:opacity-40 cursor-pointer"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+                Generate More Comments
+              </button>
               {activeCampaign.linkedin_url && (
                 <a
                   href={activeCampaign.linkedin_url}
@@ -366,69 +359,32 @@ export default function AdminCampaignPage() {
               />
             </div>
 
-            {/* Goal + Type — side by side */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div>
-                <label className="block text-[11px] font-medium text-[var(--ink-muted)] mb-2 tracking-[0.08em] uppercase">Post Goal</label>
-                <select value={postGoal} onChange={(e) => setPostGoal(e.target.value)} className="input-editorial w-full focus-ring cursor-pointer">
-                  <option value="">Select goal...</option>
-                  <option value="Hiring">Hiring</option>
-                  <option value="Branding">Branding</option>
-                  <option value="Product Launch">Product Launch</option>
-                  <option value="Thought Leadership">Thought Leadership</option>
-                  <option value="Event Promotion">Event Promotion</option>
-                  <option value="Company Culture">Company Culture</option>
-                  <option value="Industry Insights">Industry Insights</option>
-                  <option value="Engagement">General Engagement</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-[11px] font-medium text-[var(--ink-muted)] mb-2 tracking-[0.08em] uppercase">Campaign Type</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {([
-                    { value: "posts", label: "Posts Only" },
-                    { value: "comments", label: "Comments Only" },
-                    { value: "both", label: "Both" },
-                  ] as const).map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setCampaignType(opt.value)}
-                      className={`py-2.5 px-2 rounded-xl text-[11px] font-semibold border transition-all cursor-pointer ${
-                        campaignType === opt.value
-                          ? "bg-[var(--ink)] text-white border-[var(--ink)]"
-                          : "bg-[var(--surface-elevated)] text-[var(--ink-muted)] border-[var(--border)] hover:border-[var(--border-strong)]"
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            {/* Post Goal */}
+            <div>
+              <label className="block text-[11px] font-medium text-[var(--ink-muted)] mb-2 tracking-[0.08em] uppercase">Post Goal</label>
+              <select value={postGoal} onChange={(e) => setPostGoal(e.target.value)} className="input-editorial w-full focus-ring cursor-pointer">
+                <option value="">Select goal...</option>
+                <option value="Hiring">Hiring</option>
+                <option value="Branding">Branding</option>
+                <option value="Product Launch">Product Launch</option>
+                <option value="Thought Leadership">Thought Leadership</option>
+                <option value="Event Promotion">Event Promotion</option>
+                <option value="Company Culture">Company Culture</option>
+                <option value="Industry Insights">Industry Insights</option>
+                <option value="Engagement">General Engagement</option>
+              </select>
             </div>
-
-            {/* Source URL (if comments) */}
-            {(campaignType === "comments" || campaignType === "both") && !sourceUrl && (
-              <div>
-                <label className="block text-[11px] font-medium text-[var(--ink-muted)] mb-2 tracking-[0.08em] uppercase">Source Post URL <span className="text-[var(--ink-faint)] normal-case tracking-normal">(for comment redirect)</span></label>
-                <input type="url" value={sourceUrl} onChange={(e) => setSourceUrl(e.target.value)} placeholder="https://www.linkedin.com/posts/..." className="input-editorial w-full focus-ring" />
-              </div>
-            )}
 
             {/* Counts */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {campaignType !== "comments" && (
-                <div>
-                  <label className="block text-[11px] font-medium text-[var(--ink-muted)] mb-2 tracking-[0.08em] uppercase">Posts to Generate</label>
-                  <input type="text" inputMode="numeric" value={variations} onChange={(e) => setVariations(parseInt(e.target.value.replace(/[^0-9]/g, '')) || 0)} className="input-editorial w-full focus-ring" />
-                </div>
-              )}
-              {campaignType !== "posts" && (
-                <div>
-                  <label className="block text-[11px] font-medium text-[var(--ink-muted)] mb-2 tracking-[0.08em] uppercase">Comments to Generate</label>
-                  <input type="text" inputMode="numeric" value={commentCount} onChange={(e) => setCommentCount(parseInt(e.target.value.replace(/[^0-9]/g, '')) || 0)} className="input-editorial w-full focus-ring" />
-                </div>
-              )}
+              <div>
+                <label className="block text-[11px] font-medium text-[var(--ink-muted)] mb-2 tracking-[0.08em] uppercase">Posts to Generate</label>
+                <input type="text" inputMode="numeric" value={variations} onChange={(e) => setVariations(parseInt(e.target.value.replace(/[^0-9]/g, '')) || 0)} className="input-editorial w-full focus-ring" />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-[var(--ink-muted)] mb-2 tracking-[0.08em] uppercase">Comments to Generate</label>
+                <input type="text" inputMode="numeric" value={commentCount} onChange={(e) => setCommentCount(parseInt(e.target.value.replace(/[^0-9]/g, '')) || 0)} className="input-editorial w-full focus-ring" />
+              </div>
             </div>
 
             {/* Submit */}
