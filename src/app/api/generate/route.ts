@@ -101,13 +101,14 @@ const POSTS_SYSTEM = `You are a world-class LinkedIn ghostwriter with deep exper
 - Do NOT add @mentions or tag anyone — no @ symbols at all
 
 RULES:
+- Each post MUST be at least 60-75% of the line count of the original post. If the source has 10 lines, each generated post should have at least 6-8 lines.
+- NEVER use "--" (double dash) anywhere in a post
 - Each post MUST use a DIFFERENT psychological trigger as its core driver
 - Each post MUST have a DIFFERENT opening hook style
-- Each post MUST have a DIFFERENT structure and length (some 3 lines, some 8+ lines)
+- Each post MUST have a DIFFERENT structure and format
 - Vary emoji usage: some heavy, some light, some zero
 - Vary tone dramatically across posts
 - NO two posts should feel like they came from the same template
-- Keep posts concise (3-8 lines each) to maximize output count
 - Write like a HUMAN — include personality, opinions, raw energy
 
 OUTPUT: Return a JSON object with a "posts" array. Each element is one complete post as a string.`;
