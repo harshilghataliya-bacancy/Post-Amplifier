@@ -77,12 +77,13 @@ export default function AdminPage() {
         body: JSON.stringify({ url: linkedinUrl.trim() }),
       });
       const data = await res.json();
-      if (data.text) {
+      if (data.text && !data.text.toLowerCase().includes("sign in or join now")) {
         setMainPost(data.text);
         setSourceUrl(linkedinUrl.trim());
         setProgress(`Fetched via ${data.method}`);
       } else {
-        setProgress("Could not auto-fetch. Please paste the post content manually.");
+        setSourceUrl(linkedinUrl.trim());
+        setProgress("LinkedIn blocked auto-fetch. Please paste the post content below.");
       }
     } catch {
       setProgress("Failed to fetch. Please paste manually.");
