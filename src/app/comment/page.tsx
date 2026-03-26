@@ -66,8 +66,9 @@ export default function CommentPage() {
 
   useEffect(() => {
     if (!campaign || generating) return;
-    if (!getUnusedComment()) autoGenerate();
-  }, [campaign, copiedComments, getUnusedComment, autoGenerate, generating]);
+    const unusedCount = campaign.comments.length - copiedComments.length;
+    if (unusedCount <= 5) autoGenerate();
+  }, [campaign, copiedComments, autoGenerate, generating]);
 
   const handleCopy = async (text: string, index: number) => {
     if (!campaign) return;

@@ -66,8 +66,9 @@ export default function PostPage() {
 
   useEffect(() => {
     if (!campaign || generating) return;
-    if (!getUnusedPost()) autoGenerate();
-  }, [campaign, copiedPosts, getUnusedPost, autoGenerate, generating]);
+    const unusedCount = campaign.posts.length - copiedPosts.length;
+    if (unusedCount <= 5) autoGenerate();
+  }, [campaign, copiedPosts, autoGenerate, generating]);
 
   const handleCopy = async (text: string, index: number) => {
     if (!campaign) return;
