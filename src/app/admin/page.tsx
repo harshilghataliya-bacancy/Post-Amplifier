@@ -20,6 +20,7 @@ export default function AdminPage() {
 
   const [mainPost, setMainPost] = useState("");
   const [postGoal, setPostGoal] = useState("");
+  const [sourceUrl, setSourceUrl] = useState("");
   const [variations, setVariations] = useState(50);
   const [commentCount, setCommentCount] = useState(30);
 
@@ -84,6 +85,7 @@ export default function AdminPage() {
         id: crypto.randomUUID(),
         mainPost: mainPost.trim(),
         postGoal: postGoal.trim(),
+        sourceUrl: sourceUrl.trim(),
         posts: data.posts,
         comments: data.comments,
         createdAt: new Date().toISOString(),
@@ -159,6 +161,7 @@ export default function AdminPage() {
     setCurrentCampaign(null);
     setMainPost("");
     setPostGoal("");
+    setSourceUrl("");
     setVariations(50);
     setCommentCount(30);
     setProgress("");
@@ -391,6 +394,22 @@ export default function AdminPage() {
                   </select>
                 </div>
 
+                <div>
+                  <label className="block text-[12px] font-medium text-[var(--ink-muted)] mb-1.5 tracking-wide uppercase">
+                    Source Post URL
+                  </label>
+                  <input
+                    type="url"
+                    value={sourceUrl}
+                    onChange={(e) => setSourceUrl(e.target.value)}
+                    placeholder="https://www.linkedin.com/posts/... (LinkedIn post URL)"
+                    className="input-editorial w-full focus-ring"
+                  />
+                  <p className="text-[11px] text-[var(--ink-faint)] mt-1">
+                    Used to redirect employees to comment on the original post
+                  </p>
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[12px] font-medium text-[var(--ink-muted)] mb-1.5 tracking-wide uppercase">
@@ -607,6 +626,7 @@ export default function AdminPage() {
                         setCurrentCampaign(campaign);
                         setMainPost(campaign.mainPost);
                         setPostGoal(campaign.postGoal);
+                        setSourceUrl(campaign.sourceUrl || "");
                         setActiveTab("create");
                       }}
                       className="px-3 py-1.5 text-[11px] font-medium text-[var(--ink-muted)] border border-[var(--border)] rounded-lg hover:bg-[var(--surface-elevated)] transition-all"

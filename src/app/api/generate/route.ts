@@ -118,7 +118,7 @@ RULES:
 - Each post MUST use a DIFFERENT psychological trigger as its core driver
 - Each post MUST have a DIFFERENT opening hook style
 - Each post MUST have a DIFFERENT structure and format
-- Vary emoji usage: some heavy, some light, some zero
+- EVERY post MUST include 2-5 relevant emojis (🚀 💡 🔥 ✅ 🎯 💪 📈 🌟 ⚡ 🏆 etc.) placed naturally in the text
 - Vary tone dramatically across posts
 - NO two posts should feel like they came from the same template
 - Write like a HUMAN — include personality, opinions, raw energy
@@ -150,8 +150,9 @@ RULES:
 - Do NOT use @mentions or tag anyone — no @ symbols at all
 - If the original post contains a URL/link, include that exact URL in comments where relevant
 - NEVER generic ("Great post!", "Love this!", "So true!")
+- Each comment MUST include 1-3 relevant emojis (🔥 💯 🚀 👏 💡 ✅ 🎯 📌 etc.)
 - Each comment must add VALUE or spark CONVERSATION
-- Keep short: 1-2 sentences each to maximize output count
+- Keep short: 1-3 sentences each to maximize output count
 - Sound like a real professional, not a bot
 - Use natural language — contractions, casual phrasing, genuine reactions
 
