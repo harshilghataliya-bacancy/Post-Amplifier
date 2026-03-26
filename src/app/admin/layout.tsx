@@ -11,8 +11,6 @@ interface AdminContextType {
   loadCampaigns: () => Promise<void>;
   generating: boolean;
   setGenerating: (v: boolean) => void;
-  progress: string;
-  setProgress: (v: string) => void;
 }
 
 const AdminContext = createContext<AdminContextType | null>(null);
@@ -32,7 +30,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [campaigns, setCampaigns] = useState<CampaignWithMetrics[]>([]);
   const [activeCampaign, setActiveCampaign] = useState<CampaignWithMetrics | null>(null);
   const [generating, setGenerating] = useState(false);
-  const [progress, setProgress] = useState("");
 
   const loadCampaigns = useCallback(async () => {
     try {
@@ -135,7 +132,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   return (
-    <AdminContext.Provider value={{ campaigns, activeCampaign, loadCampaigns, generating, setGenerating, progress, setProgress }}>
+    <AdminContext.Provider value={{ campaigns, activeCampaign, loadCampaigns, generating, setGenerating }}>
       <div className="min-h-screen bg-[var(--background)] noise-bg">
         {/* ── Top Navbar ── */}
         <header className="sticky top-0 z-30 bg-[var(--surface)]/80 backdrop-blur-xl border-b border-[var(--border)] animate-slide-down">
@@ -204,27 +201,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </div>
         </header>
-
-        {/* Progress toast */}
-        {progress && (
-          <div className="fixed bottom-6 right-6 z-50 animate-scale-in">
-            <div className={`flex items-center gap-2.5 text-[12px] font-medium px-4 py-3 rounded-xl shadow-lg border ${
-              progress.startsWith("Error")
-                ? "bg-[var(--danger-surface)] text-[var(--danger)] border-[var(--danger)]/10"
-                : "bg-[var(--surface)] text-[var(--ink)] border-[var(--border)]"
-            }`}>
-              {progress.startsWith("Error") ? (
-                <svg className="w-4 h-4 shrink-0 text-[var(--danger)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-              ) : (
-                <svg className="w-4 h-4 shrink-0 text-[var(--success)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-              )}
-              {progress}
-              <button onClick={() => setProgress("")} className="ml-2 text-[var(--ink-faint)] hover:text-[var(--ink)] transition-colors cursor-pointer">
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Page content — centered, max-w-5xl to fill properly */}
         <div className="max-w-5xl mx-auto px-6 py-8 animate-fade-up">
