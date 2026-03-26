@@ -100,9 +100,21 @@ const POSTS_SYSTEM = `You are a world-class LinkedIn ghostwriter with deep exper
 - Place the URL naturally within the post (usually near the end or as a CTA)
 - Do NOT add @mentions or tag anyone — no @ symbols at all
 
+⚠️ LENGTH RULE (CRITICAL — MUST FOLLOW):
+- Count the number of lines in the original post (including blank lines between paragraphs)
+- Each generated post MUST have AT LEAST 60-75% as many lines as the original
+- Example: if the source post is 20 lines, each generated post MUST be at least 12-15 lines
+- Example: if the source post is 10 lines, each generated post MUST be at least 6-8 lines
+- SHORT 2-3 LINE POSTS ARE STRICTLY FORBIDDEN when the source is longer
+- Use line breaks (\\n) between paragraphs for readability, just like the original post
+- If the source uses bullet points or lists, generated posts should also use similar structured formatting
+
+🚫 FORBIDDEN:
+- NEVER use "--" (double dash/em dash) anywhere in a post
+- NEVER use "—" (em dash) anywhere in a post
+- Use commas, periods, or line breaks instead
+
 RULES:
-- Each post MUST be at least 60-75% of the line count of the original post. If the source has 10 lines, each generated post should have at least 6-8 lines.
-- NEVER use "--" (double dash) anywhere in a post
 - Each post MUST use a DIFFERENT psychological trigger as its core driver
 - Each post MUST have a DIFFERENT opening hook style
 - Each post MUST have a DIFFERENT structure and format
@@ -111,7 +123,7 @@ RULES:
 - NO two posts should feel like they came from the same template
 - Write like a HUMAN — include personality, opinions, raw energy
 
-OUTPUT: Return a JSON object with a "posts" array. Each element is one complete post as a string.`;
+OUTPUT: Return a JSON object with a "posts" array. Each element is one complete post as a string. Use \\n for line breaks within each post.`;
 
 const COMMENTS_SYSTEM = `You are a LinkedIn engagement strategist with expertise in MARKETING PSYCHOLOGY and COMMUNITY BUILDING. The current year is 2026 — use current trends and references.
 
@@ -184,7 +196,7 @@ export async function POST(request: NextRequest) {
               { role: "system", content: POSTS_SYSTEM },
               {
                 role: "user",
-                content: `ORIGINAL POST:\n"""\n${mainPost}\n"""\n\nGOAL: ${postGoal}\n\nBatch ${batchNum} of ${numBatches}. Generate EXACTLY ${batchCount} unique posts. Each must use a different psychological trigger and hook style. Keep each post 3-8 lines. ${batchNum > 1 ? "Make these COMPLETELY DIFFERENT from other batches — use fresh angles, hooks, and tones." : "Go."}`,
+                content: `ORIGINAL POST (${mainPost.split('\n').length} lines):\n"""\n${mainPost}\n"""\n\nGOAL: ${postGoal}\n\nBatch ${batchNum} of ${numBatches}. Generate EXACTLY ${batchCount} unique posts. Each must use a different psychological trigger and hook style. IMPORTANT: The source post is ${mainPost.split('\n').length} lines long, so each generated post MUST be at least ${Math.ceil(mainPost.split('\n').length * 0.6)}-${Math.ceil(mainPost.split('\n').length * 0.75)} lines. Use \\n for line breaks. Do NOT use -- or — anywhere. ${batchNum > 1 ? "Make these COMPLETELY DIFFERENT from other batches, use fresh angles, hooks, and tones." : "Go."}`,
               },
             ],
             POSTS_SCHEMA
