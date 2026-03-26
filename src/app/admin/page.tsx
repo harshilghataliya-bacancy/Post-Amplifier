@@ -219,7 +219,8 @@ export default function AdminPage() {
   const handlePublish = () => {
     if (!currentCampaign) return;
     const updated = { ...currentCampaign, published: true };
-    saveCampaign(updated);
+    // Write directly to ensure data is saved correctly
+    localStorage.setItem("linkedin_amplifier_campaigns", JSON.stringify([updated]));
     setCurrentCampaign(updated);
     setProgress("Campaign is now live!");
   };
