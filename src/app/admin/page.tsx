@@ -434,7 +434,7 @@ export default function AdminPage() {
 
                 <button
                   onClick={handleGenerate}
-                  disabled={generating || !mainPost.trim() || !postGoal}
+                  disabled={generating || !mainPost.trim() || !postGoal || !!currentCampaign}
                   className={`btn-primary w-full flex items-center justify-center gap-2.5 focus-ring ${generating ? 'animate-pulse-glow' : ''}`}
                 >
                   {generating ? (
