@@ -7,41 +7,6 @@ import { getCampaign, getCopiedItems, markCopied } from "@/lib/storage";
 
 const ITEMS_PER_PAGE = 20;
 
-// Render {{tag:description}} as styled badges
-function renderWithTags(text: string) {
-  const parts = text.split(/(\{\{tag:[^}]+\}\})/g);
-  if (parts.length === 1) return <span>{text}</span>;
-
-  return (
-    <>
-      {parts.map((part, i) => {
-        const tagMatch = part.match(/^\{\{tag:(.+)\}\}$/);
-        if (tagMatch) {
-          return (
-            <span
-              key={i}
-              className="inline-flex items-center gap-0.5 px-1.5 py-0.5 mx-0.5 bg-[var(--linkedin-surface)] text-[var(--linkedin)] text-[12px] font-medium rounded-md border border-[var(--linkedin)]/20 whitespace-nowrap"
-              title={`Type @ on LinkedIn and search for: ${tagMatch[1]}`}
-            >
-              <svg className="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="4" />
-                <path d="M16 8v5a3 3 0 006 0v-1a10 10 0 10-3.92 7.94" />
-              </svg>
-              {tagMatch[1]}
-            </span>
-          );
-        }
-        return <span key={i}>{part}</span>;
-      })}
-    </>
-  );
-}
-
-// Convert {{tag:description}} to "@description" for clipboard
-function prepareForCopy(text: string): string {
-  return text.replace(/\{\{tag:([^}]+)\}\}/g, "@$1");
-}
-
 export default function CampaignDetailPage({
   params,
 }: {
@@ -103,7 +68,7 @@ export default function CampaignDetailPage({
     originalIndex: number,
     displayIndex: number
   ) => {
-    await navigator.clipboard.writeText(prepareForCopy(text));
+    await navigator.clipboard.writeText(text);
     markCopied(id, activeTab, originalIndex);
     setCopiedItems((prev) => ({
       ...prev,
@@ -306,7 +271,7 @@ export default function CampaignDetailPage({
                       </span>
                     )}
                     <p className="text-[13px] text-[var(--ink)] whitespace-pre-wrap leading-[1.7]">
-                      {renderWithTags(item)}
+                      {item}
                     </p>
                   </div>
 
