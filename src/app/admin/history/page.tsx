@@ -8,10 +8,9 @@ type SortKey = "date" | "goal" | "posts" | "comments" | "copies" | "users";
 type SortDir = "asc" | "desc";
 
 export default function HistoryPage() {
-  const { campaigns, loadCampaigns, setProgress } = useAdmin();
+  const { campaigns } = useAdmin();
   const [sortKey, setSortKey] = useState<SortKey>("date");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
-  const [reactivating, setReactivating] = useState<string | null>(null);
 
   // All non-active campaigns
   const historyCampaigns = campaigns.filter((c) => !c.is_active);
@@ -37,18 +36,6 @@ export default function HistoryPage() {
     }
   };
 
-  const handleReactivate = async (id: string) => {
-    setReactivating(id);
-    try {
-      await fetch(`/api/campaigns/${id}/publish`, { method: "POST" });
-      await loadCampaigns();
-      setProgress("Campaign reactivated!");
-    } catch {
-      setProgress("Error: Failed to reactivate campaign");
-    } finally {
-      setReactivating(null);
-    }
-  };
 
   const SortIcon = ({ col }: { col: SortKey }) => {
     if (sortKey !== col) return <svg className="w-3 h-3 text-[var(--ink-faint)]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" /></svg>;
@@ -131,7 +118,6 @@ export default function HistoryPage() {
                     </button>
                   </th>
                 ))}
-                <th className="px-5 py-3.5 w-[100px]" />
               </tr>
             </thead>
             <tbody>
@@ -172,15 +158,6 @@ export default function HistoryPage() {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <span className="text-[14px] font-semibold text-[var(--ink)]">{c.metrics.uniqueUsers}</span>
-                    </td>
-                    <td className="px-5 py-4 text-right">
-                      <button
-                        onClick={() => handleReactivate(c.id)}
-                        disabled={reactivating === c.id}
-                        className="px-3 py-1.5 rounded-lg text-[11px] font-semibold border border-[var(--border)] text-[var(--ink-faint)] opacity-0 group-hover:opacity-100 hover:border-[var(--linkedin)] hover:text-[var(--linkedin)] hover:bg-[var(--linkedin-surface)]/50 transition-all disabled:opacity-40 cursor-pointer"
-                      >
-                        {reactivating === c.id ? "..." : "Reactivate"}
-                      </button>
                     </td>
                   </tr>
                 );

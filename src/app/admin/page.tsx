@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useAdmin } from "./layout";
 
 export default function AdminCampaignPage() {
-  const { activeCampaign, campaigns, loadCampaigns, generating, setGenerating, setProgress } = useAdmin();
+  const { activeCampaign, campaigns, loadCampaigns, generating, setGenerating } = useAdmin();
 
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [mainPost, setMainPost] = useState("");
@@ -30,13 +30,11 @@ export default function AdminCampaignPage() {
       if (data.text && !data.text.toLowerCase().includes("sign in or join now")) {
         setMainPost(data.text);
         setSourceUrl(linkedinUrl.trim());
-        setProgress(`Fetched via ${data.method}`);
       } else {
         setSourceUrl(linkedinUrl.trim());
-        setProgress("LinkedIn blocked auto-fetch. Paste the post content below.");
       }
     } catch {
-      setProgress("Error: Failed to fetch. Please paste manually.");
+      // Failed to fetch — user can paste manually
     } finally {
       setFetchingUrl(false);
     }
@@ -45,7 +43,6 @@ export default function AdminCampaignPage() {
   const handleGenerate = async () => {
     if (!mainPost.trim() || !postGoal.trim()) return;
     setGenerating(true);
-    setProgress("Generating content...");
 
     try {
       const createRes = await fetch("/api/campaigns", {
@@ -84,12 +81,11 @@ export default function AdminCampaignPage() {
       // Auto-publish the new campaign
       await fetch(`/api/campaigns/${campaign.id}/publish`, { method: "POST" });
 
-      setProgress(`Generated ${(genData.posts || []).length} posts and ${(genData.comments || []).length} comments. Campaign is live!`);
       setShowNewForm(false);
       resetForm();
       await loadCampaigns();
     } catch (error: unknown) {
-      setProgress(`Error: ${error instanceof Error ? error.message : "Generation failed"}`);
+      // Generation failed
     } finally {
       setGenerating(false);
     }
@@ -98,7 +94,6 @@ export default function AdminCampaignPage() {
   const handleGenerateMore = async (type: "posts" | "comments") => {
     if (!activeCampaign) return;
     setGenerating(true);
-    setProgress(`Generating more ${type}...`);
     try {
       const res = await fetch("/api/generate", {
         method: "POST",
@@ -122,10 +117,9 @@ export default function AdminCampaignPage() {
           comments: [...activeCampaign.comments, ...(data.comments || [])],
         }),
       });
-      setProgress(`+${type === "posts" ? (data.posts?.length || 0) : (data.comments?.length || 0)} ${type} generated`);
       await loadCampaigns();
     } catch {
-      setProgress(`Error: Failed to generate more ${type}`);
+      // Failed to generate more
     } finally {
       setGenerating(false);
     }
