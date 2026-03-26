@@ -132,10 +132,25 @@ export default function AdminCampaignPage() {
     setSourceUrl("");
   };
 
+  // ── Generating overlay ──
+  const GeneratingOverlay = () => generating ? (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--ink)]/40 backdrop-blur-sm animate-fade-up">
+      <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] px-10 py-8 text-center shadow-2xl max-w-sm w-full mx-4">
+        <div className="w-12 h-12 mx-auto mb-5 relative">
+          <div className="absolute inset-0 rounded-full border-[3px] border-[var(--border)]" />
+          <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-[var(--linkedin)] animate-spin" />
+        </div>
+        <p className="text-[15px] font-semibold text-[var(--ink)] mb-1.5">Generating content</p>
+        <p className="text-[12px] text-[var(--ink-faint)] leading-relaxed">Creating posts and comments for your campaign. This may take a moment.</p>
+      </div>
+    </div>
+  ) : null;
+
   // ── New Campaign Form view ──
   if (showNewForm) {
     return (
       <div className="space-y-6">
+        <GeneratingOverlay />
         <section className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] overflow-hidden">
           <div className="px-6 py-5 border-b border-[var(--border)]/60 flex items-center justify-between">
             <h2 className="text-[16px] font-semibold text-[var(--ink)]">New Campaign</h2>
@@ -264,6 +279,7 @@ export default function AdminCampaignPage() {
 
   return (
     <div className="space-y-6">
+      <GeneratingOverlay />
       {/* Metrics row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
