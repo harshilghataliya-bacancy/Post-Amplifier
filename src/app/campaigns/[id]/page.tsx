@@ -15,14 +15,12 @@ export default function CampaignDetailPage({
   const { id } = use(params);
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [activeTab, setActiveTab] = useState<"posts" | "comments">("posts");
-  const [searchQuery, setSearchQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [copiedItems, setCopiedItems] = useState<{
     posts: number[];
     comments: number[];
   }>({ posts: [], comments: [] });
-  const [showUnusedFirst, setShowUnusedFirst] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -38,30 +36,30 @@ export default function CampaignDetailPage({
   useEffect(() => {
     setVisibleCount(ITEMS_PER_PAGE);
     setCopiedIndex(null);
-  }, [activeTab, searchQuery]);
+  }, [activeTab]);
 
   const items = useMemo(() => {
     if (!campaign) return [];
     const source = activeTab === "posts" ? campaign.posts : campaign.comments;
     const usedSet = new Set(copiedItems[activeTab]);
 
-    let indexed = source.map((item, i) => ({ item, originalIndex: i }));
+    const indexed = source.map((item, i) => ({ item, originalIndex: i }));
 
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      indexed = indexed.filter((x) => x.item.toLowerCase().includes(q));
+    const unused = indexed.filter((x) => !usedSet.has(x.originalIndex));
+    const used = indexed.filter((x) => usedSet.has(x.originalIndex));
+
+    // If all are used, shuffle used items so they get a fresh order
+    if (unused.length === 0 && used.length > 0) {
+      for (let i = used.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [used[i], used[j]] = [used[j], used[i]];
+      }
+      return used;
     }
 
-    if (showUnusedFirst) {
-      indexed.sort((a, b) => {
-        const aUsed = usedSet.has(a.originalIndex) ? 1 : 0;
-        const bUsed = usedSet.has(b.originalIndex) ? 1 : 0;
-        return aUsed - bUsed;
-      });
-    }
-
-    return indexed;
-  }, [campaign, activeTab, searchQuery, copiedItems, showUnusedFirst]);
+    // Otherwise show unused first, then used
+    return [...unused, ...used];
+  }, [campaign, activeTab, copiedItems]);
 
   const handleCopy = async (
     text: string,
@@ -189,35 +187,6 @@ export default function CampaignDetailPage({
                 </button>
               ))}
             </div>
-
-            {/* Search */}
-            <div className="flex-1 relative">
-              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--ink-faint)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                placeholder={`Search ${activeTab}...`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="input-editorial w-full pl-10 focus-ring"
-              />
-            </div>
-
-            {/* Filter toggle */}
-            <button
-              onClick={() => setShowUnusedFirst(!showUnusedFirst)}
-              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-[12px] font-medium border transition-all shrink-0 ${
-                showUnusedFirst
-                  ? 'bg-[var(--linkedin-surface)] text-[var(--linkedin)] border-[var(--linkedin)]/20'
-                  : 'bg-[var(--surface)] text-[var(--ink-muted)] border-[var(--border)] hover:border-[var(--border-strong)]'
-              }`}
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-              </svg>
-              Unused first
-            </button>
           </div>
 
           {/* Usage progress */}
@@ -328,7 +297,7 @@ export default function CampaignDetailPage({
               </svg>
             </div>
             <p className="text-[14px] text-[var(--ink-faint)]">
-              {searchQuery ? "No results match your search" : `No ${activeTab} available`}
+              No {activeTab} available
             </p>
           </div>
         )}
