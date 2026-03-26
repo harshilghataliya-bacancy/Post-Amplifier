@@ -3,6 +3,7 @@ export interface Campaign {
   mainPost: string;
   postGoal: string;
   sourceUrl: string;
+  campaignType: "posts" | "comments" | "both";
   posts: string[];
   comments: string[];
   createdAt: string;
