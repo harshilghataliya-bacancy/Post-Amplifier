@@ -75,7 +75,7 @@ export default function HistoryPage() {
   const totalPosts = historyCampaigns.reduce((sum, c) => sum + c.posts.length, 0);
 
   return (
-    <div className="max-w-[1080px]">
+    <div className="">
       {/* Summary row */}
       <div className="grid grid-cols-3 gap-4 mb-8">
         {[

@@ -161,7 +161,7 @@ export default function AdminCampaignPage() {
   const draftCampaigns = campaigns.filter((c) => !c.is_active && !c.published);
 
   return (
-    <div className="max-w-[960px] space-y-8">
+    <div className="space-y-8">
       {/* ── Active Campaign ── */}
       {activeCampaign ? (
         <section>
