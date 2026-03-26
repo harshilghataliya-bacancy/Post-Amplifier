@@ -24,6 +24,10 @@ export function getCampaign(id: string): Campaign | null {
   return getCampaigns().find((c) => c.id === id) || null;
 }
 
+export function getActiveCampaign(): Campaign | null {
+  return getCampaigns().find((c) => c.published) || null;
+}
+
 export function deleteCampaign(id: string): void {
   const campaigns = getCampaigns().filter((c) => c.id !== id);
   localStorage.setItem(CAMPAIGNS_KEY, JSON.stringify(campaigns));
