@@ -6,39 +6,13 @@ import { useAdmin } from "./layout";
 export default function AdminCampaignPage() {
   const { activeCampaign, campaigns, loadCampaigns, generating, setGenerating } = useAdmin();
 
-  const [linkedinUrl, setLinkedinUrl] = useState("");
   const [mainPost, setMainPost] = useState("");
   const [postGoal, setPostGoal] = useState("");
-  const [sourceUrl, setSourceUrl] = useState("");
   const campaignType = "both" as const;
   const [variations, setVariations] = useState(50);
   const [commentCount, setCommentCount] = useState(30);
-  const [fetchingUrl, setFetchingUrl] = useState(false);
   const [showNewForm, setShowNewForm] = useState(false);
   const [showFullPost, setShowFullPost] = useState(false);
-
-  const handleFetchUrl = async () => {
-    if (!linkedinUrl.trim()) return;
-    setFetchingUrl(true);
-    try {
-      const res = await fetch("/api/fetch-post", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: linkedinUrl.trim() }),
-      });
-      const data = await res.json();
-      if (data.text && !data.text.toLowerCase().includes("sign in or join now")) {
-        setMainPost(data.text);
-        setSourceUrl(linkedinUrl.trim());
-      } else {
-        setSourceUrl(linkedinUrl.trim());
-      }
-    } catch {
-      // Failed to fetch — user can paste manually
-    } finally {
-      setFetchingUrl(false);
-    }
-  };
 
   const handleGenerate = async () => {
     if (!mainPost.trim() || !postGoal.trim()) return;
@@ -51,8 +25,6 @@ export default function AdminCampaignPage() {
         body: JSON.stringify({
           main_post: mainPost.trim(),
           post_goal: postGoal.trim(),
-          source_url: sourceUrl.trim(),
-          linkedin_url: linkedinUrl.trim(),
           campaign_type: campaignType,
         }),
       });
@@ -126,10 +98,8 @@ export default function AdminCampaignPage() {
   };
 
   const resetForm = () => {
-    setLinkedinUrl("");
     setMainPost("");
     setPostGoal("");
-    setSourceUrl("");
   };
 
   // ── Generating overlay ──
@@ -160,31 +130,6 @@ export default function AdminCampaignPage() {
           </div>
 
           <div className="p-6 space-y-5">
-            {/* LinkedIn URL */}
-            <div>
-              <label className="block text-[11px] font-medium text-[var(--ink-muted)] mb-2 tracking-[0.08em] uppercase">LinkedIn Post URL</label>
-              <div className="flex gap-2">
-                <input
-                  type="url"
-                  value={linkedinUrl}
-                  onChange={(e) => setLinkedinUrl(e.target.value)}
-                  placeholder="https://www.linkedin.com/posts/..."
-                  className="input-editorial flex-1 focus-ring"
-                />
-                <button
-                  onClick={handleFetchUrl}
-                  disabled={fetchingUrl || !linkedinUrl.trim()}
-                  className="px-5 py-2 bg-[var(--ink)] text-white rounded-xl text-[12px] font-semibold hover:bg-[var(--linkedin-dark)] transition-all disabled:opacity-40 shrink-0 cursor-pointer flex items-center gap-2"
-                >
-                  {fetchingUrl ? (
-                    <><svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Fetching</>
-                  ) : (
-                    <>Fetch Post</>
-                  )}
-                </button>
-              </div>
-            </div>
-
             {/* Post content */}
             <div>
               <label className="block text-[11px] font-medium text-[var(--ink-muted)] mb-2 tracking-[0.08em] uppercase">Post Content</label>
@@ -308,20 +253,7 @@ export default function AdminCampaignPage() {
       <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] overflow-hidden">
         {/* Header row */}
         <div className="px-6 py-4 border-b border-[var(--border)]/60 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-[14px] font-semibold text-[var(--ink)]">{activeCampaign.post_goal}</span>
-            {activeCampaign.linkedin_url && (
-              <a
-                href={activeCampaign.linkedin_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-[11px] text-[var(--linkedin)] hover:underline"
-              >
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                LinkedIn
-              </a>
-            )}
-          </div>
+          <span className="text-[14px] font-semibold text-[var(--ink)]">{activeCampaign.post_goal}</span>
           <button
             onClick={() => setShowNewForm(true)}
             className="px-3.5 py-2 text-[11px] font-semibold text-[var(--linkedin)] bg-[var(--linkedin-surface)] rounded-xl hover:bg-[var(--linkedin)]/10 transition-all border border-[var(--linkedin)]/10 cursor-pointer"
