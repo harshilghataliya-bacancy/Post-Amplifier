@@ -4,6 +4,22 @@ import { GenerateRequest } from "@/lib/types";
 
 const BATCH_SIZE = 30; // posts per parallel API call
 
+// Strip emojis and dashes from generated text
+function cleanText(text: string): string {
+  return text
+    // Remove emojis
+    .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{200D}\u{20E3}\u{E0020}-\u{E007F}]/gu, "")
+    // Remove em dashes and double dashes
+    .replace(/—/g, ",")
+    .replace(/--/g, ",")
+    // Remove leading hyphens used as bullets (line start)
+    .replace(/^[\s]*-[\s]+/gm, "")
+    // Clean up extra spaces
+    .replace(/  +/g, " ")
+    .replace(/\n +/g, "\n")
+    .trim();
+}
+
 async function callGPTJson<T>(
   messages: { role: string; content: string }[],
   schema: { name: string; schema: object }
@@ -112,13 +128,15 @@ const POSTS_SYSTEM = `You are a world-class LinkedIn ghostwriter with deep exper
 🚫 FORBIDDEN:
 - NEVER use "--" (double dash/em dash) anywhere in a post
 - NEVER use "—" (em dash) anywhere in a post
+- NEVER use "-" (single dash/hyphen) as a separator or bullet point
 - Use commas, periods, or line breaks instead
+- NEVER use any emojis or emoticons anywhere in the post. Zero emojis. Plain text only.
 
 RULES:
 - Each post MUST use a DIFFERENT psychological trigger as its core driver
 - Each post MUST have a DIFFERENT opening hook style
 - Each post MUST have a DIFFERENT structure and format
-- EVERY post MUST include exactly 3-4 relevant emojis (🚀 💡 🔥 ✅ 🎯 💪 📈 🌟 ⚡ 🏆 👇 🧠 🔑 ✨ etc.) placed naturally in the text, NOT all at the beginning or end
+- Do NOT include any emojis whatsoever. Write in plain text only.
 - Vary tone dramatically across posts
 - NO two posts should feel like they came from the same template
 - Write like a HUMAN — include personality, opinions, raw energy
@@ -147,10 +165,11 @@ const COMMENTS_SYSTEM = `You are a LinkedIn engagement strategist with expertise
 8. Data/stat dropper — adds a relevant fact or figure
 
 RULES:
-- Do NOT use @mentions or tag anyone — no @ symbols at all
+- Do NOT use @mentions or tag anyone, no @ symbols at all
 - If the original post contains a URL/link, include that exact URL in comments where relevant
 - NEVER generic ("Great post!", "Love this!", "So true!")
-- Each comment MUST include exactly 2-3 relevant emojis (🔥 💯 🚀 👏 💡 ✅ 🎯 📌 🙌 ✨ 💪 etc.) placed naturally within the text
+- Do NOT include any emojis or emoticons whatsoever. Plain text only. Zero emojis.
+- NEVER use "--", "—", or "-" as separators or bullet points
 - Each comment must add VALUE or spark CONVERSATION
 - Keep short: 1-3 sentences each to maximize output count
 - Sound like a real professional, not a bot
@@ -236,9 +255,12 @@ export async function POST(request: NextRequest) {
 
     const rawPosts = postBatchResults
       .flatMap((r) => r.posts)
+      .map(cleanText)
       .filter((p) => p.length > 20);
 
-    const rawComments = commentsResult.comments.filter((c) => c.length > 5);
+    const rawComments = commentsResult.comments
+      .map(cleanText)
+      .filter((c) => c.length > 5);
 
     console.log(
       `API calls: ${postBatchIndices.length} post batches + ${commentsIndex >= 0 ? 1 : 0} comments = ${allPromises.length} total | Raw: ${rawPosts.length} posts, ${rawComments.length} comments`
