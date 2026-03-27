@@ -8,6 +8,7 @@ export default function AdminCampaignPage() {
 
   const [mainPost, setMainPost] = useState("");
   const [postGoal, setPostGoal] = useState("");
+  const [linkedinUrl, setLinkedinUrl] = useState("");
   const campaignType = "both" as const;
   const [variations, setVariations] = useState(50);
   const [commentCount, setCommentCount] = useState(30);
@@ -25,6 +26,8 @@ export default function AdminCampaignPage() {
         body: JSON.stringify({
           main_post: mainPost.trim(),
           post_goal: postGoal.trim(),
+          source_url: linkedinUrl.trim(),
+          linkedin_url: linkedinUrl.trim(),
           campaign_type: campaignType,
         }),
       });
@@ -100,6 +103,7 @@ export default function AdminCampaignPage() {
   const resetForm = () => {
     setMainPost("");
     setPostGoal("");
+    setLinkedinUrl("");
   };
 
   // ── Generating overlay ──
@@ -156,6 +160,19 @@ export default function AdminCampaignPage() {
                 <option value="Industry Insights">Industry Insights</option>
                 <option value="Engagement">General Engagement</option>
               </select>
+            </div>
+
+            {/* LinkedIn Source URL */}
+            <div>
+              <label className="block text-[11px] font-medium text-[var(--ink-muted)] mb-2 tracking-[0.08em] uppercase">LinkedIn Post URL</label>
+              <input
+                type="url"
+                value={linkedinUrl}
+                onChange={(e) => setLinkedinUrl(e.target.value)}
+                placeholder="https://www.linkedin.com/posts/..."
+                className="input-editorial w-full focus-ring"
+              />
+              <p className="text-[10px] text-[var(--ink-faint)] mt-1.5">Employees will be redirected here to post comments</p>
             </div>
 
             {/* Counts */}
