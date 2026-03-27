@@ -140,7 +140,7 @@ export default function AdminCampaignPage() {
               <textarea
                 value={mainPost}
                 onChange={(e) => setMainPost(e.target.value)}
-                placeholder="Paste or fetch the original LinkedIn post content..."
+                placeholder="Paste the original LinkedIn post content here..."
                 className="input-editorial w-full resize-none focus-ring"
                 rows={5}
               />
